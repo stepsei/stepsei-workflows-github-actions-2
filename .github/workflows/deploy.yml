@@ -39,5 +39,5 @@ jobs:
         working-directory: ./terraform-resources
       - name: Terraform Apply Workspace Prod
         id: apply-prod
-        run: terraform apply -var-file=”prod.tfvars” --auto-approve
+        run: terraform apply -var-file="prod.tfvars" -auto-approve
         working-directory: ./terraform-resources
