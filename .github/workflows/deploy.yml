@@ -1,0 +1,41 @@
+name: Terraform CI CD Pipeline for Deploying AWS Resources
+run-name: ${{ github.actor }} has triggered the pipeline
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  build-infra:
+    name: terraform-ci-cd
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: ./terraform-resources
+      - name: Terraform Validate
+        id: validate-prod
+        run: terraform validate
+        working-directory: ./terraform-resources
+      - name: Terraform Switch Workspace Prod
+        id: select-prod
+        run: terraform workspace select prod
+        working-directory: ./terraform-resources
+      - name: Terraform Plan Prod
+        id: plan-prod
+        run: terraform plan -var-file="prod.tfvars" 
+        working-directory: ./terraform-resources
+      - name: Terraform Apply Workspace Prod
+        id: apply-prod
+        run: terraform apply -var-file=”prod.tfvars” -auto-approve
+        working-directory: ./terraform-resources
